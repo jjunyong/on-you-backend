@@ -117,11 +117,6 @@ public class ClubQRepositoryImpl extends QuerydslRepositorySupport implements Cl
         String customSortType = getCustomSortType(page); //
         StringTemplate stringTemplate = getCustomStringTemplate(customSortType);
 
-        Category requestedCategory = categoryRepository.findById(clubCondition.getCategoryId())
-                .orElseThrow(
-                        () -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND)
-                );
-
         return queryFactory
                 .select(new QClubConditionResponse(
                         club.id,
@@ -146,12 +141,7 @@ public class ClubQRepositoryImpl extends QuerydslRepositorySupport implements Cl
                 .leftJoin(club.organization, organization)
                 .leftJoin(club.creator, user)
                 .where(
-                        club.id.in(
-                                JPAExpressions.
-                                select(club.id).from(clubCategory)
-                                        .innerJoin(clubCategory.club, club)
-                                        .where(clubCategory.category.eq(requestedCategory))
-                        ),
+                        showRequestedCategory(clubCondition),
                         customCursorCompare(page, clubCondition, customCursor),
                         showMyClub(clubCondition, currentUser),
                         showRecruitingOnly(clubCondition),
@@ -162,6 +152,24 @@ public class ClubQRepositoryImpl extends QuerydslRepositorySupport implements Cl
                 .orderBy(clubSort(page, clubCondition))
                 .limit(page.getPageSize())
                 .fetch();
+    }
+
+    private BooleanExpression showRequestedCategory(ClubCondition clubCondition){
+        if (clubCondition == null || clubCondition.getCategoryId()==0) {
+            return null;
+        }
+
+        Category requestedCategory = categoryRepository.findById(clubCondition.getCategoryId())
+                .orElseThrow(
+                        () -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND)
+                );
+
+        return club.id.in(
+                JPAExpressions.
+                        select(club.id).from(clubCategory)
+                        .innerJoin(clubCategory.club, club)
+                        .where(clubCategory.category.eq(requestedCategory))
+        );
     }
 
     private BooleanExpression showMyClub(ClubCondition clubCondition, User currentUser){
