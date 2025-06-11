@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScenaMon Architecture - Perfect Arrows</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .architecture-container {
+            width: 1800px;
+            height: 1000px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .architecture-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #3B82F6, #1E40AF, #3730A3);
+        }
+        
+        .title {
+            text-align: center;
+            padding: 40px 0 20px 0;
+        }
+        
+        .title h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #3B82F6, #1E40AF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: -2px;
+        }
+        
+        .title p {
+            color: #6B7280;
+            font-size: 1.4rem;
+            margin: 15px 0 0 0;
+            font-weight: 500;
+        }
+        
+        /* Kubernetes Cluster Background */
+        .k8s-cluster {
+            position: absolute;
+            top: 150px;
+            left: 60px;
+            width: 1680px;
+            height: 700px;
+            border: 4px dashed #3B82F6;
+            border-radius: 25px;
+            background: rgba(59, 130, 246, 0.03);
+        }
+        
+        .k8s-label {
+            position: absolute;
+            top: -18px;
+            left: 30px;
+            background: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #3B82F6;
+            font-size: 1.1rem;
+            border: 3px solid #3B82F6;
+        }
+        
+        /* Components with exact positioning */
+        .component {
+            position: absolute;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        /* User - Top Center */
+        .user {
+            top: 50px;
+            left: 810px; /* 900px center - 90px half width */
+            width: 180px;
+            height: 80px;
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+        }
+        
+        /* Frontend - Left */
+        .frontend {
+            top: 200px;
+            left: 150px; /* 300px center - 150px half width */
+            width: 300px;
+            height: 120px;
+            background: linear-gradient(135deg, #10B981, #059669);
+        }
+        
+        /* API Server - Right */
+        .api-server {
+            top: 200px;
+            left: 1350px; /* 1500px center - 150px half width */
+            width: 300px;
+            height: 120px;
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+        }
+        
+        /* RabbitMQ - Center */
+        .rabbitmq {
+            top: 400px;
+            left: 750px; /* 900px center - 150px half width */
+            width: 300px;
+            height: 100px;
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+        }
+        
+        /* Workers Section */
+        .workers-section {
+            position: absolute;
+            top: 650px;
+            left: 450px; /* Center the 900px wide section */
+            width: 900px;
+            text-align: center;
+        }
+        
+        .keda-controller {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            border-radius: 12px;
+            padding: 10px 20px;
+            margin-bottom: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: inline-block;
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+        }
+        
+        .workers-container {
+            display: flex;
+            justify-content: space-around;
+            position: relative;
+        }
+        
+        .worker {
+            width: 150px;
+            height: 100px;
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+            position: relative;
+            border: 2px dashed #F59E0B;
+        }
+        
+        .auto-scale-indicator {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #F59E0B;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .scale-arrows {
+            position: absolute;
+            top: 50%;
+            left: -30px;
+            right: -30px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        
+        .scale-arrow-left {
+            border: solid #F59E0B;
+            border-width: 0 12px 8px 0;
+            width: 0;
+            height: 0;
+            transform: rotate(45deg);
+        }
+        
+        .scale-arrow-right {
+            border: solid #F59E0B;
+            border-width: 8px 12px 0 0;
+            width: 0;
+            height: 0;
+            transform: rotate(45deg);
+        }
+        
+        .component-title {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+        
+        .component-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 3px;
+        }
+        
+        .deployment-badge {
+            background: rgba(255,255,255,0.25);
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+        
+        /* Arrow System */
+        .arrow {
+            position: absolute;
+            z-index: 100;
+        }
+        
+        .arrow-line {
+            background: linear-gradient(45deg, #374151, #6B7280);
+            position: relative;
+        }
+        
+        .arrow-head {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+        
+        /* Vertical arrows */
+        .vertical-arrow .arrow-line {
+            width: 4px;
+            border-radius: 2px;
+        }
+        
+        .vertical-arrow .arrow-head {
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 6px 0 6px;
+            border-color: #374151 transparent transparent transparent;
+        }
+        
+        .down .arrow-head {
+            bottom: -10px;
+        }
+        
+        .up .arrow-head {
+            top: -10px;
+            transform: translateX(-50%) rotate(180deg);
+        }
+        
+        /* Horizontal arrows */
+        .horizontal-arrow .arrow-line {
+            height: 4px;
+            border-radius: 2px;
+        }
+        
+        .horizontal-arrow .arrow-head {
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 6px 0 6px 10px;
+            border-color: transparent transparent transparent #374151;
+        }
+        
+        .right .arrow-head {
+            right: -10px;
+        }
+        
+        .left .arrow-head {
+            left: -10px;
+            transform: translateY(-50%) rotate(180deg);
+        }
+        
+        /* Diagonal arrows */
+        .diagonal-arrow .arrow-line {
+            height: 4px;
+            border-radius: 2px;
+            transform-origin: left center;
+        }
+        
+        .diagonal-arrow .arrow-head {
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 6px 0 6px 10px;
+            border-color: transparent transparent transparent #374151;
+        }
+        
+        /* Flow labels */
+        .flow-label {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #374151;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+        
+        /* Specific Arrows with exact coordinates */
+        
+        /* User (center: 900px, bottom: 130px) to Frontend (center: 300px, top: 200px) */
+        .arrow1 {
+            top: 130px;
+            left: 898px;
+        }
+        .arrow1 .arrow-line {
+            height: 70px;
+        }
+        .arrow1 .flow-label {
+            left: 10px;
+            top: 25px;
+        }
+        
+        /* Frontend (right: 450px, center: 260px) to API Server (left: 1350px, center: 260px) */
+        .arrow2 {
+            top: 258px;
+            left: 450px;
+        }
+        .arrow2 .arrow-line {
+            width: 900px;
+        }
+        .arrow2 .flow-label {
+            left: 400px;
+            top: -30px;
+        }
+        
+        /* API Server (center: 1500px, bottom: 320px) to RabbitMQ (center: 900px, top: 400px) */
+        .arrow3 {
+            top: 320px;
+            left: 900px;
+        }
+        .arrow3 .arrow-line {
+            width: 600px;
+            transform: rotate(-8deg);
+        }
+        .arrow3 .flow-label {
+            left: 250px;
+            top: -30px;
+        }
+        
+        /* Frontend (center: 300px, bottom: 320px) to RabbitMQ (center: 900px, top: 400px) */
+        .arrow4 {
+            top: 320px;
+            left: 300px;
+        }
+        .arrow4 .arrow-line {
+            width: 600px;
+            transform: rotate(8deg);
+        }
+        .arrow4 .flow-label {
+            left: 250px;
+            top: -30px;
+        }
+        
+        /* RabbitMQ (center: 900px, bottom: 500px) to Workers (center: 900px, top: 650px) */
+        .arrow5 {
+            top: 500px;
+            left: 898px;
+        }
+        .arrow5 .arrow-line {
+            height: 150px;
+        }
+        .arrow5 .flow-label {
+            left: 10px;
+            top: 65px;
+        }
+    </style>
+</head>
+<body>
+    <div class="architecture-container">
+        <div class="title">
+            <h1>ScenaMon Architecture</h1>
+            <p>Playwright 기반 웹 시나리오 모니터링 시스템</p>
+        </div>
+        
+        <!-- Kubernetes Cluster Background -->
+        <div class="k8s-cluster">
+            <div class="k8s-label">🚢 Kubernetes Cluster</div>
+        </div>
+        
+        <!-- Components -->
+        <div class="component user">
+            <div style="font-size: 2rem;">👥</div>
+            <div style="font-size: 1.2rem;">사용자</div>
+        </div>
+        
+        <div class="component frontend">
+            <div class="component-title">Frontend</div>
+            <div class="component-subtitle">React App</div>
+            <div class="component-subtitle">시나리오 관리 UI</div>
+            <div class="deployment-badge">Deployment</div>
+        </div>
+        
+        <div class="component api-server">
+            <div class="component-title">API Server</div>
+            <div class="component-subtitle">Spring Boot</div>
+            <div class="component-subtitle">Kotlin + JPA</div>
+            <div class="deployment-badge">Deployment</div>
+        </div>
+        
+        <div class="component rabbitmq">
+            <div class="component-title">🐰 RabbitMQ</div>
+            <div class="component-subtitle">Message Queue</div>
+            <div class="deployment-badge">StatefulSet</div>
+        </div>
+        
+        <!-- Workers Section -->
+        <div class="workers-section">
+            <div class="keda-controller">
+                📈 KEDA Auto Scaler
+            </div>
+            <div style="font-weight: bold; color: #374151; margin-bottom: 15px; font-size: 1.2rem;">
+                Playwright Workers
+            </div>
+            <div class="workers-container">
+                <div class="scale-arrows">
+                    <div class="scale-arrow-left"></div>
+                    <div class="scale-arrow-right"></div>
+                </div>
+                <div class="worker">
+                    <div class="auto-scale-indicator">Auto Scale</div>
+                    <div style="font-size: 1.8rem; margin-bottom: 5px;">🎭</div>
+                    <div style="font-size: 0.9rem; font-weight: bold;">Worker 1</div>
+                    <div style="font-size: 0.8rem;">Chromium</div>
+                </div>
+                <div class="worker">
+                    <div class="auto-scale-indicator">Auto Scale</div>
+                    <div style="font-size: 1.8rem; margin-bottom: 5px;">🎭</div>
+                    <div style="font-size: 0.9rem; font-weight: bold;">Worker 2</div>
+                    <div style="font-size: 0.8rem;">Firefox</div>
+                </div>
+                <div class="worker">
+                    <div class="auto-scale-indicator">Auto Scale</div>
+                    <div style="font-size: 1.8rem; margin-bottom: 5px;">🎭</div>
+                    <div style="font-size: 0.9rem; font-weight: bold;">Worker 3</div>
+                    <div style="font-size: 0.8rem;">WebKit</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Perfect Arrows -->
+        
+        <!-- Arrow 1: User to Frontend -->
+        <div class="arrow vertical-arrow down arrow1">
+            <div class="arrow-line"></div>
+            <div class="arrow-head"></div>
+            <div class="flow-label">HTTP</div>
+        </div>
+        
+        <!-- Arrow 2: Frontend to API Server -->
+        <div class="arrow horizontal-arrow right arrow2">
+            <div class="arrow-line"></div>
+            <div class="arrow-head"></div>
+            <div class="flow-label">REST API</div>
+        </div>
+        
+        <!-- Arrow 3: API Server to RabbitMQ -->
+        <div class="arrow diagonal-arrow arrow3">
+            <div class="arrow-line"></div>
+            <div class="arrow-head"></div>
+            <div class="flow-label">Enqueue</div>
+        </div>
+        
+        <!-- Arrow 4: Frontend to RabbitMQ -->
+        <div class="arrow diagonal-arrow arrow4">
+            <div class="arrow-line"></div>
+            <div class="arrow-head"></div>
+            <div class="flow-label">SSE</div>
+        </div>
+        
+        <!-- Arrow 5: RabbitMQ to Workers -->
+        <div class="arrow vertical-arrow down arrow5">
+            <div class="arrow-line"></div>
+            <div class="arrow-head"></div>
+            <div class="flow-label">Execute</div>
+        </div>
+    </div>
+</body>
+</html>
