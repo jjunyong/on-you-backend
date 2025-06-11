@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScenaMon Architecture</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .architecture-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .architecture-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3B82F6, #1E40AF, #3730A3);
+        }
+        
+        .title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .title h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #3B82F6, #1E40AF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .title p {
+            color: #6B7280;
+            font-size: 1.1rem;
+            margin: 10px 0 0 0;
+        }
+        
+        .diagram {
+            position: relative;
+            height: 700px;
+            margin: 20px 0;
+        }
+        
+        /* Kubernetes Cluster Background */
+        .k8s-cluster {
+            position: absolute;
+            top: 100px;
+            left: 50px;
+            right: 50px;
+            bottom: 50px;
+            border: 3px dashed #3B82F6;
+            border-radius: 20px;
+            background: rgba(59, 130, 246, 0.02);
+            padding: 20px;
+        }
+        
+        .k8s-label {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #3B82F6;
+            font-size: 0.9rem;
+            border: 2px solid #3B82F6;
+        }
+        
+        /* User/Browser */
+        .user-section {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        
+        .user-box {
+            width: 120px;
+            height: 80px;
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+        }
+        
+        .user-icon {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        /* Frontend */
+        .frontend {
+            position: absolute;
+            top: 140px;
+            left: 100px;
+            width: 200px;
+            height: 120px;
+            background: linear-gradient(135deg, #10B981, #059669);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+        
+        .component-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .component-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 3px;
+        }
+        
+        .deployment-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        /* API Server */
+        .api-server {
+            position: absolute;
+            top: 140px;
+            right: 100px;
+            width: 200px;
+            height: 120px;
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* RabbitMQ */
+        .rabbitmq {
+            position: absolute;
+            top: 320px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 100px;
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+        
+        /* Workers */
+        .workers-section {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            text-align: center;
+        }
+        
+        .workers-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        
+        .worker {
+            width: 120px;
+            height: 90px;
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+            position: relative;
+        }
+        
+        .worker-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .keda-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #F59E0B;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.6rem;
+            font-weight: bold;
+        }
+        
+        /* Arrows */
+        .arrow {
+            position: absolute;
+            z-index: 10;
+        }
+        
+        .arrow-down {
+            width: 3px;
+            height: 40px;
+            background: linear-gradient(to bottom, #6B7280, #374151);
+            border-radius: 2px;
+        }
+        
+        .arrow-horizontal {
+            height: 3px;
+            background: linear-gradient(to right, #6B7280, #374151);
+            border-radius: 2px;
+        }
+        
+        .arrow-diagonal {
+            height: 3px;
+            background: linear-gradient(45deg, #6B7280, #374151);
+            border-radius: 2px;
+            transform-origin: left center;
+        }
+        
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+        
+        .arrow-down::after {
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 8px 5px 0 5px;
+            border-color: #374151 transparent transparent transparent;
+        }
+        
+        .arrow-horizontal::after {
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 5px 0 5px 8px;
+            border-color: transparent transparent transparent #374151;
+        }
+        
+        .arrow-diagonal::after {
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 5px 0 5px 8px;
+            border-color: transparent transparent transparent #374151;
+        }
+        
+        /* Data Flow Labels */
+        .flow-label {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #374151;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Specific Arrow Positioning */
+        .user-to-frontend {
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .frontend-to-api {
+            top: 195px;
+            left: 300px;
+            width: 200px;
+        }
+        
+        .api-to-rabbitmq {
+            top: 260px;
+            right: 200px;
+            width: 120px;
+            transform: rotate(45deg);
+        }
+        
+        .rabbitmq-to-workers {
+            bottom: 170px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* Technologies Section */
+        .tech-stack {
+            margin-top: 50px;
+            text-align: center;
+        }
+        
+        .tech-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #1F2937;
+            margin-bottom: 20px;
+        }
+        
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .tech-item {
+            background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #374151;
+            border: 1px solid #D1D5DB;
+            transition: transform 0.2s;
+        }
+        
+        .tech-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tech-icon {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="architecture-container">
+        <div class="title">
+            <h1>ScenaMon Architecture</h1>
+            <p>Playwright 기반 웹 시나리오 모니터링 시스템</p>
+        </div>
+        
+        <div class="diagram">
+            <!-- Kubernetes Cluster Background -->
+            <div class="k8s-cluster">
+                <div class="k8s-label">🚢 Kubernetes Cluster</div>
+            </div>
+            
+            <!-- User/Browser -->
+            <div class="user-section">
+                <div class="user-box">
+                    <div class="user-icon">👥</div>
+                    <div>사용자</div>
+                </div>
+            </div>
+            
+            <!-- Frontend -->
+            <div class="frontend">
+                <div class="component-title">Frontend</div>
+                <div class="component-subtitle">React App</div>
+                <div class="component-subtitle">시나리오 관리 UI</div>
+                <div class="deployment-badge">Deployment</div>
+            </div>
+            
+            <!-- API Server -->
+            <div class="api-server">
+                <div class="component-title">API Server</div>
+                <div class="component-subtitle">Spring Boot</div>
+                <div class="component-subtitle">Kotlin + JPA</div>
+                <div class="deployment-badge">Deployment</div>
+            </div>
+            
+            <!-- RabbitMQ -->
+            <div class="rabbitmq">
+                <div class="component-title">🐰 RabbitMQ</div>
+                <div class="component-subtitle">Message Queue</div>
+                <div class="deployment-badge">StatefulSet</div>
+            </div>
+            
+            <!-- Workers -->
+            <div class="workers-section">
+                <div style="font-weight: bold; color: #374151; margin-bottom: 10px;">Playwright Workers</div>
+                <div class="workers-container">
+                    <div class="worker">
+                        <div class="keda-badge">KEDA</div>
+                        <div class="worker-icon">🎭</div>
+                        <div style="font-size: 0.8rem;">Worker 1</div>
+                        <div style="font-size: 0.7rem;">Chromium</div>
+                    </div>
+                    <div class="worker">
+                        <div class="keda-badge">KEDA</div>
+                        <div class="worker-icon">🎭</div>
+                        <div style="font-size: 0.8rem;">Worker 2</div>
+                        <div style="font-size: 0.7rem;">Firefox</div>
+                    </div>
+                    <div class="worker">
+                        <div class="keda-badge">KEDA</div>
+                        <div class="worker-icon">🎭</div>
+                        <div style="font-size: 0.8rem;">Worker 3</div>
+                        <div style="font-size: 0.7rem;">WebKit</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Arrows and Flow Labels -->
+            <div class="arrow arrow-down user-to-frontend">
+                <div class="flow-label" style="left: 20px; top: 15px;">HTTP</div>
+            </div>
+            
+            <div class="arrow arrow-horizontal frontend-to-api">
+                <div class="flow-label" style="top: -25px; left: 50px;">REST API</div>
+            </div>
+            
+            <div class="arrow arrow-diagonal api-to-rabbitmq">
+                <div class="flow-label" style="top: -25px; left: 30px;">Queue</div>
+            </div>
+            
+            <div class="arrow arrow-down rabbitmq-to-workers">
+                <div class="flow-label" style="left: 20px; top: 15px;">Tasks</div>
+            </div>
+        </div>
+        
+        <!-- Technology Stack -->
+        <div class="tech-stack">
+            <div class="tech-title">🛠️ Technology Stack</div>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <span class="tech-icon">⚛️</span>
+                    React
+                </div>
+                <div class="tech-item">
+                    <span class="tech-icon">🍃</span>
+                    Spring Boot
+                </div>
+                <div class="tech-item">
+                    <span class="tech-icon">🎭</span>
+                    Playwright
+                </div>
+                <div class="tech-item">
+                    <span class="tech-icon">🐰</span>
+                    RabbitMQ
+                </div>
+                <div class="tech-item">
+                    <span class="tech-icon">🚢</span>
+                    Kubernetes
+                </div>
+                <div class="tech-item">
+                    <span class="tech-icon">📈</span>
+                    KEDA
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
