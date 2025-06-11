@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScenaMon Architecture - 1920x1080</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .architecture-container {
+            width: 1820px;
+            height: 980px;
+            margin: 50px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .architecture-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #3B82F6, #1E40AF, #3730A3);
+        }
+        
+        .title {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .title h1 {
+            font-size: 4rem;
+            background: linear-gradient(135deg, #3B82F6, #1E40AF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: -2px;
+        }
+        
+        .title p {
+            color: #6B7280;
+            font-size: 1.6rem;
+            margin: 20px 0 0 0;
+            font-weight: 500;
+        }
+        
+        .diagram {
+            position: relative;
+            height: 700px;
+            margin: 20px 0;
+        }
+        
+        /* Kubernetes Cluster Background */
+        .k8s-cluster {
+            position: absolute;
+            top: 120px;
+            left: 100px;
+            right: 100px;
+            bottom: 50px;
+            border: 4px dashed #3B82F6;
+            border-radius: 30px;
+            background: rgba(59, 130, 246, 0.03);
+            padding: 40px;
+        }
+        
+        .k8s-label {
+            position: absolute;
+            top: -20px;
+            left: 40px;
+            background: white;
+            padding: 8px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            color: #3B82F6;
+            font-size: 1.2rem;
+            border: 3px solid #3B82F6;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+        }
+        
+        /* User/Browser */
+        .user-section {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        
+        .user-box {
+            width: 180px;
+            height: 120px;
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 12px 35px rgba(245, 158, 11, 0.4);
+        }
+        
+        .user-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .user-text {
+            font-size: 1.4rem;
+        }
+        
+        /* Frontend */
+        .frontend {
+            position: absolute;
+            top: 180px;
+            left: 200px;
+            width: 280px;
+            height: 160px;
+            background: linear-gradient(135deg, #10B981, #059669);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
+        }
+        
+        .component-title {
+            font-weight: bold;
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+        }
+        
+        .component-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .deployment-badge {
+            background: rgba(255,255,255,0.25);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        
+        /* API Server */
+        .api-server {
+            position: absolute;
+            top: 180px;
+            right: 200px;
+            width: 280px;
+            height: 160px;
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* RabbitMQ */
+        .rabbitmq {
+            position: absolute;
+            top: 400px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 240px;
+            height: 130px;
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 12px 35px rgba(239, 68, 68, 0.4);
+        }
+        
+        /* Workers */
+        .workers-section {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            text-align: center;
+        }
+        
+        .keda-controller {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            border-radius: 15px;
+            padding: 12px 25px;
+            margin-bottom: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: inline-block;
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+        
+        .workers-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            position: relative;
+        }
+        
+        .worker {
+            width: 160px;
+            height: 120px;
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 12px 35px rgba(139, 92, 246, 0.4);
+            position: relative;
+            border: 3px dashed #F59E0B;
+        }
+        
+        .worker-icon {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+        
+        .worker-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        
+        .worker-browser {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .auto-scale-indicator {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #F59E0B;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        .scale-arrows {
+            position: absolute;
+            top: 50%;
+            left: -40px;
+            right: -40px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        
+        .scale-arrow {
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+        
+        .scale-arrow-left {
+            border-width: 12px 18px 12px 0;
+            border-color: transparent #F59E0B transparent transparent;
+        }
+        
+        .scale-arrow-right {
+            border-width: 12px 0 12px 18px;
+            border-color: transparent transparent transparent #F59E0B;
+        }
+        
+        /* Arrows */
+        .arrow {
+            position: absolute;
+            z-index: 10;
+        }
+        
+        .arrow-down {
+            width: 4px;
+            background: linear-gradient(to bottom, #6B7280, #374151);
+            border-radius: 2px;
+        }
+        
+        .arrow-horizontal {
+            height: 4px;
+            background: linear-gradient(to right, #6B7280, #374151);
+            border-radius: 2px;
+        }
+        
+        .arrow-diagonal {
+            height: 4px;
+            background: linear-gradient(45deg, #6B7280, #374151);
+            border-radius: 2px;
+            transform-origin: left center;
+        }
+        
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+        
+        .arrow-down::after {
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 6px 0 6px;
+            border-color: #374151 transparent transparent transparent;
+        }
+        
+        .arrow-horizontal::after {
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 6px 0 6px 10px;
+            border-color: transparent transparent transparent #374151;
+        }
+        
+        .arrow-diagonal::after {
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 6px 0 6px 10px;
+            border-color: transparent transparent transparent #374151;
+        }
+        
+        /* Data Flow Labels */
+        .flow-label {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #374151;
+            border: 2px solid #E5E7EB;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* Specific Arrow Positioning */
+        /* User(960px center) to Frontend(340px center) */
+        .user-to-frontend {
+            top: 140px;
+            left: 958px;
+            height: 40px;
+        }
+        
+        /* Frontend(480px right edge) to API Server(1240px left edge) */
+        .frontend-to-api {
+            top: 258px;
+            left: 480px;
+            width: 760px;
+        }
+        
+        /* API Server(1380px center) to RabbitMQ(960px center) */
+        .api-to-rabbitmq {
+            top: 340px;
+            left: 960px;
+            width: 298px;
+            transform: rotate(20deg);
+            transform-origin: left center;
+        }
+        
+        /* Frontend(340px center) to RabbitMQ(960px center) */
+        .frontend-to-rabbitmq {
+            top: 340px;
+            left: 340px;
+            width: 440px;
+            transform: rotate(-15deg);
+            transform-origin: left center;
+        }
+        
+        /* RabbitMQ(960px center) to Workers(960px center) */
+        .rabbitmq-to-workers {
+            top: 530px;
+            left: 958px;
+            height: 40px;
+        }
+        
+        .workers-title {
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="architecture-container">
+        <div class="title">
+            <h1>ScenaMon Architecture</h1>
+            <p>Playwright 기반 웹 시나리오 모니터링 시스템</p>
+        </div>
+        
+        <div class="diagram">
+            <!-- Kubernetes Cluster Background -->
+            <div class="k8s-cluster">
+                <div class="k8s-label">🚢 Kubernetes Cluster</div>
+            </div>
+            
+            <!-- User/Browser -->
+            <div class="user-section">
+                <div class="user-box">
+                    <div class="user-icon">👥</div>
+                    <div class="user-text">사용자</div>
+                </div>
+            </div>
+            
+            <!-- Frontend -->
+            <div class="frontend">
+                <div class="component-title">Frontend</div>
+                <div class="component-subtitle">React App</div>
+                <div class="component-subtitle">시나리오 관리 UI</div>
+                <div class="deployment-badge">Deployment</div>
+            </div>
+            
+            <!-- API Server -->
+            <div class="api-server">
+                <div class="component-title">API Server</div>
+                <div class="component-subtitle">Spring Boot</div>
+                <div class="component-subtitle">Kotlin + JPA</div>
+                <div class="deployment-badge">Deployment</div>
+            </div>
+            
+            <!-- RabbitMQ -->
+            <div class="rabbitmq">
+                <div class="component-title">🐰 RabbitMQ</div>
+                <div class="component-subtitle">Message Queue</div>
+                <div class="deployment-badge">StatefulSet</div>
+            </div>
+            
+            <!-- Workers -->
+            <div class="workers-section">
+                <div class="keda-controller">
+                    📈 KEDA Auto Scaler
+                </div>
+                <div class="workers-title">Playwright Workers</div>
+                <div class="workers-container">
+                    <div class="scale-arrows">
+                        <div class="scale-arrow scale-arrow-left"></div>
+                        <div class="scale-arrow scale-arrow-right"></div>
+                    </div>
+                    <div class="worker">
+                        <div class="auto-scale-indicator">Auto Scale</div>
+                        <div class="worker-icon">🎭</div>
+                        <div class="worker-name">Worker 1</div>
+                        <div class="worker-browser">Chromium</div>
+                    </div>
+                    <div class="worker">
+                        <div class="auto-scale-indicator">Auto Scale</div>
+                        <div class="worker-icon">🎭</div>
+                        <div class="worker-name">Worker 2</div>
+                        <div class="worker-browser">Firefox</div>
+                    </div>
+                    <div class="worker">
+                        <div class="auto-scale-indicator">Auto Scale</div>
+                        <div class="worker-icon">🎭</div>
+                        <div class="worker-name">Worker 3</div>
+                        <div class="worker-browser">WebKit</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Arrows and Flow Labels -->
+            <!-- User to Frontend -->
+            <div class="arrow arrow-down user-to-frontend">
+                <div class="flow-label" style="left: 20px; top: 15px;">HTTP</div>
+            </div>
+            
+            <!-- Frontend to API Server -->
+            <div class="arrow arrow-horizontal frontend-to-api">
+                <div class="flow-label" style="top: -35px; left: 320px;">REST API</div>
+            </div>
+            
+            <!-- API Server to RabbitMQ -->
+            <div class="arrow arrow-diagonal api-to-rabbitmq">
+                <div class="flow-label" style="top: -35px; left: 100px;">Enqueue</div>
+            </div>
+            
+            <!-- Frontend to RabbitMQ -->
+            <div class="arrow arrow-diagonal frontend-to-rabbitmq">
+                <div class="flow-label" style="top: -35px; left: 180px;">SSE</div>
+            </div>
+            
+            <!-- RabbitMQ to Workers -->
+            <div class="arrow arrow-down rabbitmq-to-workers">
+                <div class="flow-label" style="left: 20px; top: 15px;">Execute</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
